@@ -2,8 +2,7 @@
 *.osm.pbf
 *.osm
 # Results
-*.json
-!*.schema.json
+*.out.json
 
 ### Node ###
 # Logs
