@@ -1,0 +1,6 @@
+# OSM Exports
+*.osm.pbf
+*.osm
+# Results
+*.json
+!*.schema.json
