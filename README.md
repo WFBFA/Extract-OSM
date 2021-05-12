@@ -18,7 +18,9 @@ Run
 ```sh
 node extract.js
 ```
-to get started
+to get started.
+
+As per the [specification](https://github.com/WFBFA/Spec), the output follows [Road Graph Schema](https://github.com/WFBFA/Spec/blob/main/1.road-graph.schema.json).
 
 ## Example usage
 1. download Montreal area from [Overpass](https://overpass-api.de/api/map?bbox=-74.1660,45.2536,-73.2060,45.8652) and save as `montreal.osm`
