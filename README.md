@@ -26,3 +26,4 @@ to get started
 2. (optional) Run it through osmosis `osmosis --read-xml "montreal.osm" --bp file="montreal.poly" completeRelations=yes --tf accept-ways highway=* --used-node --write-xml file="montreal.roads.osm"`
 3. run the extractor script `node extract.js montreal.roads.osm montreal.roads.json --nodes`
 4. you now have the montreal road network graph in `montreal.roads.json`!
+5. run geojsoniifier script `node extract.js montreal.roads.json montreal.roads.geojson` and visualzie the produced GeoJSON on https://geojson.io/!

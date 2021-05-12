@@ -111,6 +111,23 @@ const argv = yargs(hideBin(process.argv))
 			},
 		});
 	})
+	.command('geojson <input> <output>', "create GeoJSON from extracted data", (yargs) => {
+		return yargs
+			.positional('input', { description: "Input JSON file produced with `extract ... --nodes`" }).string('input')
+			.positional('output', { description: "Output GeoJSON file" }).string('output');
+	}, (args) => {
+		const data = JSON.parse(fs.readFileSync(args.input));
+		if(!data?.roads || !data?.nodes) throw new Error("Can only use complete extracted data");
+		const nodes = new Map();
+		for(let n of data.nodes) nodes.set(n.id, n);
+		fs.writeFileSync(args.output, JSON.stringify({
+			type: 'GeometryCollection',
+			geometries: data.roads.map(r => ({
+				type: 'LineString',
+				coordinates: [nodes.get(r.p1).coordinates, nodes.get(r.p2).coordinates],
+			})),
+		}));
+	})
 	.help()
 	.alias('help', 'h')
 	.demandCommand(1)
