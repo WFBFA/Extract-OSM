@@ -75,12 +75,10 @@ function finalize(file, roads, nodes, simplify, includeNodes){
 const argv = yargs(hideBin(process.argv))
 	.command('extract <input> <output>', 'extract and transform OSM data', (yargs) => {
 		return yargs
-			.positional('input', { description: "OSM input data file (XML or PBF)" })
-			.positional('output', { description: "Output JSON file" })
-			.boolean('nodes', { description: "Include nodes information in the export" })
-			.default('nodes', false)
-			.boolean('simplify', { description: "Simplify road geometry" })
-			.default('simplify', true);
+			.positional('input', { description: "OSM input data file (XML or PBF)" }).string('input')
+			.positional('output', { description: "Output JSON file" }).string('output')
+			.boolean('nodes').describe('nodes', "Include nodes information in the export").default('nodes', false)
+			.boolean('simplify').describe('simplify', "Simplify road geometry").default('simplify', true);
 	}, (args) => {
 		const nodes = new Map();
 		const roads = [];
