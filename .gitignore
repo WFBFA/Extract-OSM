@@ -3,7 +3,7 @@
 *.osm
 *.poly
 # Results
-*.out.json
+*.out.*
 
 ### Node ###
 # Logs
