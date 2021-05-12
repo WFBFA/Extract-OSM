@@ -42,7 +42,47 @@ function finalize(file, roads, nodes, simplify, includeNodes){
 		if(!p1 || !p2) throw new Error("Incomplete data!");
 		r.distance = haversine(p1.coordinates, p2.coordinates);
 	}
-	//TODO simplify?
+	if(simplify){
+		console.log("Simplifying roads");
+		const adj = new Map();
+		for(let r of roads){
+			let p1 = adj.get(r.p1) ?? [];
+			p1.push(r);
+			adj.set(r.p1, p1);
+			let p2 = adj.get(r.p2) ?? [];
+			p2.push(r);
+			adj.set(r.p2, p2);
+		}
+		while(true){
+			let simpd = 0;
+			for(let [n, rs] of adj) if(rs.length === 2){
+				const r1 = rs[0];
+				const r2 = rs[1];
+				if(r1.directed !== r2.directed || r1.sidewalks[0] !== r2.sidewalks[0] && r1.sidewalks[1] !== r2.sidewalks[1]) continue;
+				let r;
+				if(r1.p2 === r2.p1) r = { p1: r1.p1, p2: r2.p2 };
+				else if(r2.p2 === r1.p1) r = { p1: r2.p1, p2: r1.p2 };
+				else if(r1.p1 === r2.p1 && !r1.directed) r = { p1: r1.p2, p2: r2.p2 };
+				else if(r1.p2 === r2.p2 && !r1.directed) r = { p1: r1.p1, p2: r2.p1 };
+				else continue;
+				r.directed = r1.directed;
+				r.sidewalks = r1.sidewalks;
+				r.distance = r1.distance + r2.distance;
+				const reli = (rs) => {
+					if(rs.includes(r1)) rs.splice(rs.indexOf(r1), 1);
+					if(rs.includes(r2)) rs.splice(rs.indexOf(r2), 1);
+					rs.push(r);
+				}
+				reli(adj.get(r.p1));
+				reli(adj.get(r.p2));
+				rs.splice(0, 2);
+				simpd++;
+			}
+			if(simpd == 0) break;
+			console.log(` Reduced ${simpd}`);
+		}
+		roads = [...new Set([...adj.values()].flat())];
+	}
 	const usefulNodes = includeNodes ? (function(){
 		console.log("Stripping intermediate nodes");
 		const retain = [];
