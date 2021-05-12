@@ -1,6 +1,7 @@
 # OSM Exports
 *.osm.pbf
 *.osm
+*.poly
 # Results
 *.out.json
 
