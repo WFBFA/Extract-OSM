@@ -5,6 +5,7 @@
             "type": "array",
             "items": {
                 "type": "object",
+				"description": "A road segment",
                 "properties": {
                     "p1": {
                         "type": "string",
