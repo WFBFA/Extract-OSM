@@ -1,4 +1,7 @@
 {
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"$id": "https://github.com/WFBFA/Extract-OSM/blob/master/output.schema.json",
+	"title": "Processed road graph (extracted from OSM data)",
     "type": "object",
     "properties": {
         "roads": {
