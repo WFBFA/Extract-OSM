@@ -26,11 +26,10 @@ function processWay(way, roads, nodes){
 			return;
 	}
 	for(let n of way.nodeRefs) nodes.set(n, {});
-	roads.push({
-		p1: way.nodeRefs[0],
-		p2: way.nodeRefs[way.nodeRefs.length-1],
+	for(let i = 0; i < way.nodeRefs.length-1; i++) roads.push({
+		p1: way.nodeRefs[i],
+		p2: way.nodeRefs[i+1],
 		directed: way.tags.oneway === 'yes',
-		segments: way.nodeRefs,
 		sidewalks: way.tags.sidewalk === 'both' ? [true, true] : way.tags.sidewalk === 'left' ? [true, false] : way.tags.sidewalk === 'right' ? [false, true] : [false, false],
 	});
 }
@@ -38,16 +37,10 @@ function processWay(way, roads, nodes){
 function finalize(file, roads, nodes, simplify, includeNodes){
 	console.log("Populating distances")
 	for(let r of roads){
-		let segments = r.segments;
-		delete r.segments;
-		let d = 0;
-		for(let i = 0; i < segments.length-1; i++){
-			let p1 = nodes.get(segments[i]);
-			let p2 = nodes.get(segments[i+1]);
-			if(!p1 || !p2) throw new Error("Incomplete data!");
-			d += haversine(p1.coordinates, p2.coordinates);
-		}
-		r.distance = d;
+		const p1 = nodes.get(r.p1);
+		const p2 = nodes.get(r.p2);
+		if(!p1 || !p2) throw new Error("Incomplete data!");
+		r.distance = haversine(p1.coordinates, p2.coordinates);
 	}
 	//TODO simplify?
 	const usefulNodes = includeNodes ? (function(){
@@ -65,7 +58,7 @@ function finalize(file, roads, nodes, simplify, includeNodes){
 		}
 		return retain;
 	})() : undefined;
-	console.log(usefulNodes ? `Exporting (${roads.length} roads and ${nodes.size} nodes)` : `Exporting (${roads.length} roads)`);
+	console.log(usefulNodes ? `Exporting (${roads.length} roads and ${usefulNodes.length} nodes)` : `Exporting (${roads.length} roads)`);
 	fs.writeFileSync(file, JSON.stringify({
 		roads,
 		nodes: usefulNodes,
@@ -101,8 +94,7 @@ const argv = yargs(hideBin(process.argv))
 						});
 					},
 					error: (message) => {
-						console.error(message);
-						process.exit(1);
+						throw new Error(message);
 					},
 					endDocument: () => {
 						finalize(args.output, roads, nodes, args.simplify, args.nodes);
