@@ -33,7 +33,16 @@ function processWay(way, roads, nodes){
 			directed: way.tags.oneway === 'yes',
 			sidewalks: way.tags.sidewalk === 'both' ? [true, true] : way.tags.sidewalk === 'left' ? [true, false] : way.tags.sidewalk === 'right' ? [false, true] : [false, false],
 		};
-		if(!roads.some(rr => rr.p1 === r.p1 && rr.p2 == r.p2 && rr.directed === r.directed)) roads.push(r);
+		const k = JSON.stringify({
+			p1: way.nodeRefs[i],
+			p2: way.nodeRefs[i+1],
+		});
+		const exr = roads.get(k);
+		if(exr){
+			exr.directed &&= r.directed;
+			exr.sidewalks[0] ||= r.sidewalks[0];
+			exr.sidewalks[1] ||= r.sidewalks[1];
+		} else roads.set(k, r);
 	}
 }
 
@@ -119,7 +128,7 @@ const argv = yargs(hideBin(process.argv))
 			.boolean('simplify').describe('simplify', "Simplify road geometry").default('simplify', true);
 	}, (args) => {
 		const nodes = new Map();
-		const roads = [];
+		const roads = new Map();
 		console.log("First pass");
 		(args.input.endsWith(".osm") ? osm.parseXml : osm.parse)({
 			filePath: args.input,
@@ -142,7 +151,7 @@ const argv = yargs(hideBin(process.argv))
 						throw new Error(message);
 					},
 					endDocument: () => {
-						finalize(args.output, roads, nodes, args.simplify, args.nodes);
+						finalize(args.output, [...roads.values()], nodes, args.simplify, args.nodes);
 					},
 				});
 			},
