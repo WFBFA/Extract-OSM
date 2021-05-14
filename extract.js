@@ -148,7 +148,8 @@ const argv = yargs(hideBin(process.argv))
 	.command('geojson <input> <output>', "create GeoJSON from extracted data", (yargs) => {
 		return yargs
 			.positional('input', { description: "Input JSON file produced with `extract ... --nodes`" }).string('input')
-			.positional('output', { description: "Output GeoJSON file" }).string('output');
+			.positional('output', { description: "Output GeoJSON file" }).string('output')
+			.boolean('viad').describe('viad', "Construct lines via discriminators").default('viad', false);
 	}, (args) => {
 		const data = JSON.parse(fs.readFileSync(args.input));
 		if(!data?.roads || !data?.nodes) throw new Error("Can only use complete extracted data");
@@ -158,7 +159,7 @@ const argv = yargs(hideBin(process.argv))
 			type: 'GeometryCollection',
 			geometries: data.roads.map(r => ({
 				type: 'LineString',
-				coordinates: [nodes.get(r.p1).coordinates, nodes.get(r.p2).coordinates],
+				coordinates: args.viad && r.discriminator ? [nodes.get(r.p1).coordinates, nodes.get(r.discriminator).coordinates, nodes.get(r.p2).coordinates] : [nodes.get(r.p1).coordinates, nodes.get(r.p2).coordinates],
 			})),
 		}));
 	})
