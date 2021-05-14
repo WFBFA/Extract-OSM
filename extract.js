@@ -26,12 +26,15 @@ function processWay(way, roads, nodes){
 			return;
 	}
 	for(let n of way.nodeRefs) nodes.set(n, {});
-	for(let i = 0; i < way.nodeRefs.length-1; i++) roads.push({
-		p1: way.nodeRefs[i],
-		p2: way.nodeRefs[i+1],
-		directed: way.tags.oneway === 'yes',
-		sidewalks: way.tags.sidewalk === 'both' ? [true, true] : way.tags.sidewalk === 'left' ? [true, false] : way.tags.sidewalk === 'right' ? [false, true] : [false, false],
-	});
+	for(let i = 0; i < way.nodeRefs.length-1; i++){
+		const r = {
+			p1: way.nodeRefs[i],
+			p2: way.nodeRefs[i+1],
+			directed: way.tags.oneway === 'yes',
+			sidewalks: way.tags.sidewalk === 'both' ? [true, true] : way.tags.sidewalk === 'left' ? [true, false] : way.tags.sidewalk === 'right' ? [false, true] : [false, false],
+		};
+		if(!roads.some(rr => rr.p1 === r.p1 && rr.p2 == r.p2 && rr.directed === r.directed)) roads.push(r);
+	}
 }
 
 function finalize(file, roads, nodes, simplify, includeNodes){
