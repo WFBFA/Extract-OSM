@@ -65,6 +65,7 @@ function finalize(file, roads, nodes, simplify, includeNodes){
 				else if(r1.p1 === r2.p1 && !r1.directed) r = { p1: r1.p2, p2: r2.p2 };
 				else if(r1.p2 === r2.p2 && !r1.directed) r = { p1: r1.p1, p2: r2.p1 };
 				else continue;
+				r.discriminator = n;
 				r.directed = r1.directed;
 				r.sidewalks = r1.sidewalks;
 				r.distance = r1.distance + r2.distance;
