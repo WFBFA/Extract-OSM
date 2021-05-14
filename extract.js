@@ -96,6 +96,7 @@ function finalize(file, roads, nodes, simplify, includeNodes){
 		for(let r of roads){
 			yum(nodes.get(r.p1));
 			yum(nodes.get(r.p2));
+			yum(nodes.get(r.discriminator));
 		}
 		return retain;
 	})() : undefined;
