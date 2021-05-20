@@ -18,7 +18,6 @@ function processWay(way, roads, nodes){
 		case 'secondary_link':
 		case 'tertiary':
 		case 'tertiary_link':
-		case 'unclassified':
 		case 'residential':
 		case 'living_street':
 			break;
