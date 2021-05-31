@@ -45,7 +45,7 @@ function processWay(way, roads, nodes){
 	}
 }
 
-function finalize(file, roads, nodes, simplify, includeNodes){
+function finalize(file, roads, nodes, simplify){
 	console.log("Populating distances")
 	for(let r of roads){
 		const p1 = nodes.get(r.p1);
@@ -95,7 +95,7 @@ function finalize(file, roads, nodes, simplify, includeNodes){
 		}
 		roads = [...new Set([...adj.values()].flat())];
 	}
-	const usefulNodes = includeNodes ? (function(){
+	const usefulNodes = (function(){
 		console.log("Stripping intermediate nodes");
 		const retain = [];
 		const yum = (p) => {
@@ -110,7 +110,7 @@ function finalize(file, roads, nodes, simplify, includeNodes){
 			yum(nodes.get(r.discriminator));
 		}
 		return retain;
-	})() : undefined;
+	})();
 	console.log(usefulNodes ? `Exporting (${roads.length} roads and ${usefulNodes.length} nodes)` : `Exporting (${roads.length} roads)`);
 	fs.writeFileSync(file, JSON.stringify({
 		roads,
@@ -123,7 +123,6 @@ const argv = yargs(hideBin(process.argv))
 		return yargs
 			.positional('input', { description: "OSM input data file (XML or PBF)" }).string('input')
 			.positional('output', { description: "Output JSON file" }).string('output')
-			.boolean('nodes').describe('nodes', "Include nodes information in the export").default('nodes', false)
 			.boolean('simplify').describe('simplify', "Simplify road geometry").default('simplify', true);
 	}, (args) => {
 		const nodes = new Map();
@@ -150,7 +149,7 @@ const argv = yargs(hideBin(process.argv))
 						throw new Error(message);
 					},
 					endDocument: () => {
-						finalize(args.output, [...roads.values()], nodes, args.simplify, args.nodes);
+						finalize(args.output, [...roads.values()], nodes, args.simplify);
 					},
 				});
 			},
